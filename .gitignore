@@ -340,3 +340,6 @@ docs/source/generated/
 /*.mapping
 /*.dat
 /*.svg
+
+# my
+*,v
