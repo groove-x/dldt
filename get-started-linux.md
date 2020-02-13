@@ -217,6 +217,12 @@ To run the Image Classification sample application with an input image on the pr
    image, the IR of your model and a plugin for a hardware device to perform
    inference on:
 
+
+## GX: car.png が指定のディレクトリにない。
+https://software.intel.com/en-us/forums/intel-distribution-of-openvino-toolkit/topic/801813
+自分で何かクルマ画像を持ってきてcars.png としておいておくこと。
+
+
    **For CPU:**
    ```sh
    ./classification_sample -i <DLDT_DIR>/inference-engine/samples/sample_data/car.png -m <ir_dir>/squeezenet1.1.xml -d CPU
