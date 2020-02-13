@@ -119,6 +119,8 @@ next session to download and prepare a model for running a sample inference.
 
 ## Prepare a Model for Sample Inference
 #### GX: この部分 opencv/open_moel_zoo のリポジトリに由来する作業になる。
+#### GX: 注意 このリポジトリでのpip install -r requiremensts.in の作業を実施するとtorch の巨大なファイルを
+インストールする必要を生じてしまう。なるべく、最小限の作業に留めること。
 
 This section describes how to get a pre-trained model for sample inference
 and how to prepare the optimized Intermediate Representation (IR) that
@@ -166,6 +168,8 @@ as `<models_dir>` below) with the Model Downloader:
 
    ========= Changing input dimensions in squeezenet1.1.prototxt =========
    ```
+
+
 
 ### Convert the model to an Intermediate Representation with the Model Optimizer
 #### GX: ここからは再びdldtでの作業になる
