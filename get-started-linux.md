@@ -49,6 +49,20 @@ If you see error messages, check for any missing dependencies.
   successfully. If you access the Internet via proxy server only, please make
   sure that it is configured in your OS environment as well.
 
+#### GX:はまりどころ
+python の実行環境が venv の環境ならば、ここでのインストール作業も、venv の環境になるようにしなければならない。
+```
+sudo ./install_prerequisites.sh venv
+```
+
+Before running the Model Optimizer, please activate virtualenv environment by running "source /media/waragai/DATA5/Downloads/github/dldt/model-optimizer/install_prerequisites/../venv/bin/activate"
+
+とインストール時に警告してくれる。
+
+dldt/model-optimizer$ source venv/bin/activate
+
+ここまではまりどころ
+
 **Option 1: Configure all supported frameworks at the same time**
 
 1.  Go to the Model Optimizer prerequisites directory:
@@ -99,7 +113,12 @@ cd <DLDT_DIR>/model-optimizer/install_prerequisites
 The Model Optimizer is configured for one or more frameworks. Continue to the
 next session to download and prepare a model for running a sample inference.
 
+## GX case
+以下のスクリプトでtensorflowの処理を自動化
+10_config_tf.sh
+
 ## Prepare a Model for Sample Inference
+#### GX: この部分 opencv/open_moel_zoo のリポジトリに由来する作業になる。
 
 This section describes how to get a pre-trained model for sample inference
 and how to prepare the optimized Intermediate Representation (IR) that
@@ -149,7 +168,7 @@ as `<models_dir>` below) with the Model Downloader:
    ```
 
 ### Convert the model to an Intermediate Representation with the Model Optimizer
-
+#### GX: ここからは再びdldtでの作業になる
 > **NOTE**: This section assumes that you have configured the Model Optimizer using the instructions from the [Configure the Model Optimizer](#configure-the-model-optimizer) section.
 
 1. Create a `<ir_dir>` directory that will contains the Intermediate Representation (IR) of the model.
@@ -162,12 +181,12 @@ as `<models_dir>` below) with the Model Downloader:
 
    **For CPU (FP32):**
    ```sh  
-   python3 <DLDT_DIR>/model-optimizer/mo.py --input_model <models_dir>/classification/squeezenet/1.1/caffe/squeezenet1.1.caffemodel --data_type FP32 --output_dir <ir_dir>
+   python3 <DLDT_DIR>/model-optimizer/mo.py --framework caffe --input_model <models_dir>/classification/squeezenet/1.1/caffe/squeezenet1.1.caffemodel --data_type FP32 --output_dir <ir_dir>
    ```
 
    **For GPU and MYRIAD (FP16):**
    ```sh  
-   python3 <DLDT_DIR>/model-optimizer/mo.py --input_model <models_dir>/classification/squeezenet/1.1/caffe/squeezenet1.1.caffemodel --data_type FP16 --output_dir <ir_dir>
+   python3 <DLDT_DIR>/model-optimizer/mo.py --framework caffe --input_model <models_dir>/classification/squeezenet/1.1/caffe/squeezenet1.1.caffemodel --data_type FP16 --output_dir <ir_dir>
    ```
    After the Model Optimizer script is completed, the produced IR files (`squeezenet1.1.xml`, `squeezenet1.1.bin`) are in the specified `<ir_dir>` directory.
 
