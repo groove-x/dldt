@@ -77,16 +77,42 @@ jobs:
       - run: /usr/bin/python3.7 -m pip install numpy==1.16.3 cython==0.29.17
       - run:
           name: build
+          # see options in cmake/features_ie.cmake and cmake/features.cmake
           command: |
             mkdir build
             cd build
             cmake -DCMAKE_BUILD_TYPE=Release \
+              -D ENABLE_MYRIAD=OFF \
+              -D ENABLE_GAPI_TESTS=OFF \
+              -D ENABLE_DATA=OFF \
+              -D ENABLE_BEH_TESTS=OFF \
+              -D ENABLE_FUNCTIONAL_TESTS=OFF \
+              -D ENABLE_SAMPLES=OFF \
+              -D ENABLE_SPEECH_DEMO=OFF \
               -D ENABLE_OPENCV=OFF \
               -D ENABLE_PYTHON=ON \
+              -D ENABLE_CPPLINT=OFF \
+              -D ENABLE_CLANG_FORMAT=OFF \
+              -D ENABLE_PROFILING_ITT=OFF \
               -D PYTHON_EXECUTABLE=/usr/bin/python3.7 \
               -D PYTHON_LIBRARY=/usr/lib/libpython3.7m.so \
-              -D PYTHON_INCLUDE_DIR=/usr/include/python3.7m ..
+              -D PYTHON_INCLUDE_DIR=/usr/include/python3.7m \
+              -D CMAKE_INSTALL_PREFIX=/root/project/debian/build ..
             make --jobs=$(nproc --all)
+      - run:
+          name: make install
+          command: |
+            cd build
+            make install
+      - run:
+          name: create debian package with go-bin-deb
+          command: |
+            cd debian
+            make deb
+            mkdir -p /tmp/deb
+            cp *.deb /tmp/deb
+      - store_artifacts:
+          path: /tmp/deb
 
 workflows:
   version: 2

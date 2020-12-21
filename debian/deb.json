@@ -1,0 +1,24 @@
+{
+  "name": "openvino",
+  "arch": "amd64",
+  "maintainer": "GROOVE X Development Team <dev@groove-x.com>",
+  "description": "OpenVINO custom build",
+  "changelog-cmd": "git log --pretty='format:%cd %h %s %d [%an]' --date=iso --merges",
+  "homepage": "https://github.com/groove-x/openvino",
+  "files": [
+    {
+      "from": "build/**/**",
+      "to": "/usr",
+      "base" : "build/"
+    }
+  ],
+  "depends": [],
+  "copyrights": [
+    {
+      "files": "*",
+      "copyright": "Copyright (c) 2020, GROOVE X, Inc. All rights reserved.",
+      "license": "",
+      "file": ""
+    }
+  ]
+}
