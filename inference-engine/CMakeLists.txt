@@ -4,6 +4,8 @@
 project(InferenceEngine)
 
 set(CMAKE_MODULE_PATH "${IE_MAIN_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=attributes")
 
 include(features_ie)
 
