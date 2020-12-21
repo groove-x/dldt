@@ -1,0 +1,96 @@
+version: 2.1
+orbs:
+  git-shallow-clone: guitarrapc/git-shallow-clone@2.0.3
+
+executors:
+  default:
+    docker:
+      - image: debian:stretch
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
+
+jobs:
+  build:
+    executor:
+      name: default
+    resource_class: xlarge
+    steps:
+      - add_ssh_keys:
+          fingerprints: "00:d8:ba:42:84:2a:ec:a9:7f:4e:03:e5:e8:6f:88:1d"
+      - run:
+          name: configure backports
+          command: |
+            echo -e "deb http://ftp.jp.debian.org/debian stretch-backports main contrib non-free\ndeb http://ftp.jp.debian.org/debian stretch-backports-sloppy main contrib non-free" >> /etc/apt/sources.list
+      - run:
+          name: install dependencies
+          command: |
+            apt-get update
+            apt-get install -t stretch-backports-sloppy -y libarchive13
+            apt-get install -t stretch-backports -y cmake
+            apt-get install -y \
+              autoconf \
+              automake \
+              build-essential \
+              ca-certificates \
+              curl \
+              gcc-multilib g++-multilib \
+              git \
+              gstreamer1.0-plugins-base \
+              jq \
+              libavcodec-dev \
+              libavformat-dev \
+              libboost-regex-dev \
+              libcairo2-dev \
+              libglib2.0-dev \
+              libgstreamer1.0-0 \
+              libgtk2.0-dev \
+              libopenblas-dev \
+              libpango1.0-dev \
+              libpng-dev \
+              libssl-dev \
+              libswscale-dev \
+              libtool \
+              libusb-1.0-0-dev \
+              pkg-config \
+              unzip \
+              wget
+      - run:
+          name: packagen cloud token
+          command: |
+            curl -s "https://$PACKAGECLOUD_GET_TOKEN:@packagecloud.io/install/repositories/groove-x/lovot/script.deb.sh" | bash
+      - run: apt install gx-python3.7
+      - git-shallow-clone/checkout:
+          fetch_depth: 1
+      - run: git submodule update --init --recursive
+      - run:
+          name: install intel graphics compute runtime for opencl
+          command: |
+            mkdir -p neo
+            cd neo
+            wget https://github.com/intel/compute-runtime/releases/download/19.29.13530/intel-gmmlib_19.2.3_amd64.deb
+            wget https://github.com/intel/compute-runtime/releases/download/19.29.13530/intel-igc-core_1.0.10-2306_amd64.deb
+            wget https://github.com/intel/compute-runtime/releases/download/19.29.13530/intel-igc-opencl_1.0.10-2306_amd64.deb
+            wget https://github.com/intel/compute-runtime/releases/download/19.29.13530/intel-opencl_19.29.13530_amd64.deb
+            wget https://github.com/intel/compute-runtime/releases/download/19.29.13530/intel-ocloc_19.29.13530_amd64.deb
+            dpkg -i *.deb
+      - run: /usr/bin/python3.7 -m pip install numpy==1.16.3 cython==0.29.17
+      - run:
+          name: build
+          command: |
+            mkdir build
+            cd build
+            cmake -DCMAKE_BUILD_TYPE=Release \
+              -D ENABLE_OPENCV=OFF \
+              -D ENABLE_PYTHON=ON \
+              -D PYTHON_EXECUTABLE=/usr/bin/python3.7 \
+              -D PYTHON_LIBRARY=/usr/lib/libpython3.7m.so \
+              -D PYTHON_INCLUDE_DIR=/usr/include/python3.7m ..
+            make --jobs=$(nproc --all)
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build:
+          context: gx-global
