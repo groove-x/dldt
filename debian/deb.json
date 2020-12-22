@@ -12,7 +12,9 @@
       "base" : "build/"
     }
   ],
-  "depends": [],
+  "depends": [
+    "gx-python3.7"
+  ],
   "copyrights": [
     {
       "files": "*",
