@@ -9,6 +9,12 @@ executors:
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
+  deploy:
+    docker:
+      - image: groovex/debian:stretch
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
 
 jobs:
   build:
@@ -111,8 +117,20 @@ jobs:
             make deb
             mkdir -p /tmp/deb
             cp *.deb /tmp/deb
+      - persist_to_workspace:
+          root: /root/project/debian
+          paths:
+            - "*.deb"
       - store_artifacts:
           path: /tmp/deb
+
+  deploy:
+    executor:
+      name: deploy
+    steps:
+      - attach_workspace:
+          at: /
+      - run: push_package.sh / amd64 groove-x/lovot/debian/stretch
 
 workflows:
   version: 2
@@ -120,3 +138,10 @@ workflows:
     jobs:
       - build:
           context: gx-global
+      - deploy:
+          requires:
+            - build
+          context: gx-global
+          filters:
+            branches:
+              only: /release\/.*/
