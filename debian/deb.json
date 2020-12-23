@@ -10,11 +10,17 @@
       "from": "build/**/**",
       "to": "/usr",
       "base" : "build/"
+    },
+    {
+      "from": "extra/**/**",
+      "to": "/",
+      "base" : "extra/"
     }
   ],
   "depends": [
     "gx-python3.7"
   ],
+  "postinst-file": "maint/postinst",
   "copyrights": [
     {
       "files": "*",
