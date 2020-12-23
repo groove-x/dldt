@@ -117,6 +117,10 @@ jobs:
             make deb
             mkdir -p /tmp/deb
             cp *.deb /tmp/deb
+            # copy artifact to local (local build)
+            if [[ -d /tmp/_circleci_local_build_repo ]]; then
+              cp *.deb /tmp/_circleci_local_build_repo/debian
+            fi
       - persist_to_workspace:
           root: /root/project/debian
           paths:
