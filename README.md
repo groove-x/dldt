@@ -1,3 +1,58 @@
+# openvino for debian stretch
+
+## 概要
+
+Intel の OpenVINO を debian stretch (amd64) にインストールできるようにビルド設定を加えています。Intel の公式では debian 向けのパッケージが提供されていません。
+
+- base version: 2021.1
+
+## ビルド
+
+[Build OpenVINO™ Inference Engine](https://github.com/openvinotoolkit/openvino/blob/2021.1/build-instruction.md) を参考にビルドしました。
+
+- cmake 3.13 以上を要求されたため、backports から cmake をインストール
+- cmake のビルドに必要だったため、backports-sloppy から libarchive13 をインストール
+- install dependency は ubuntu 向けの設定を参考に設定
+- "intel graphics compute runtime for opencl" は libc6 のバージョンが整合する最新のものを選択
+- python 実行環境は `gx-python3.7` を利用
+- サンプルやテスト類を極力排除するオプションを指定
+- OpenCV のビルドは無効化
+- Python のビルドを有効化
+
+詳細は `.circleci/config.yml` を参照して下さい。
+
+## debian package の作り方
+
+CMakeLists.txt  に cpack 設定を追加する代わりに、ローカルに展開してからディレクトリ配置を再構成し、go-bin-debでdebパッケージを生成しています。
+
+- ライブラリ類は `/usr/lib` および `/usr/lib/openvino` に集約
+- `/etc/ld.so.conf.d/openvino.conf` にライブラリパスを設定
+- `postinst`で`ldconfig`を実行してライブラリパスのキャッシュを更新
+
+詳細は `debian/Makefile` を参照して下さい。
+
+## パッケージの使い方
+
+gx-python3.7 と一緒に利用して下さい。`/usr/lib/openvino/python3.7/site-packages` にパスを通せば使えるようになります。例えば、venvを使う場合は下記のようになります。
+
+```bash
+$ python3.7 -m venv venv
+$ source venv/bin/activate
+(venv)$ pip install -U pip numpy opencv-python
+(venv)$ echo /usr/lib/openvino/python3.7/site-packages > venv/lib/python3.7/site-packages/openvino.pth
+(venv)$ python
+>>> import openvino.inference_engine
+>>> from openvino.inference_engine import IENetwork, IECore
+>>> ie = IECore()
+```
+
+## opencv との関係
+
+OpenCV の API (`cv2.dnn`) を使わないなら、このまま任意の OpenCV と一緒に利用できます。OpenCV の API を利用する場合は、このビルドをベースとして OpenCV をカスタムビルドする必要があります（未対応）。
+
+
+---
+
 # [OpenVINO™ Toolkit](https://01.org/openvinotoolkit) - Deep Learning Deployment Toolkit repository
 [![Stable release](https://img.shields.io/badge/version-2021.1-green.svg)](https://github.com/openvinotoolkit/openvino/releases/tag/2021.1)
 [![Apache License Version 2.0](https://img.shields.io/badge/license-Apache_2.0-green.svg)](LICENSE)
