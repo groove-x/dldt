@@ -1,3 +1,5 @@
+2020.12.25: https://github.com/groove-x/openvino-debian に実装を移動しました。　
+
 # openvino for debian stretch
 
 ## 概要
